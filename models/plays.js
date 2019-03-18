@@ -7,6 +7,11 @@ const {sequelize} = require('../database/connection.js');
 
 
 const Play = sequelize.define('play', {
+  playID: {
+    type: Sequelize.BIGINT,
+    primaryKey: true,
+    autoIncrement: true
+  },
   nameTx: {
     type: Sequelize.CHAR(45),
   },

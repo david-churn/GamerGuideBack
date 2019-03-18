@@ -8,12 +8,10 @@ const Game = sequelize.define('game', {
   gameID: {
     type: Sequelize.BIGINT,
     primaryKey: true,
-    allowNull: false,
     autoIncrement: true
   },
   updateDtTm: {
-    type: Sequelize.DATE,
-    allowNull: false
+    type: Sequelize.DATE
   },
   nameTx: {
     type: Sequelize.CHAR(45),
@@ -49,7 +47,7 @@ const Game = sequelize.define('game', {
     allowNull: false,
     validate : { min: 1 }
   },
-  playerMaXQt: {
+  playerMaxQt: {
     type: Sequelize.TINYINT,
     allowNull: false,
     validate : { min: 1 }
@@ -64,7 +62,7 @@ const Game = sequelize.define('game', {
     allowNull: false,
     validate : { min: 1 }
   },
-  timeMaXQt: {
+  timeMaxQt: {
     type: Sequelize.SMALLINT,
     allowNull: false,
     validate : { min: 1 }
