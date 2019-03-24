@@ -31,7 +31,6 @@ const Game = sequelize.define('game', {
   },
   ratingQt: {
     type: Sequelize.TINYINT,
-    allowNull: false,
     validate: {
       min : 1,
       max : 5
@@ -39,7 +38,6 @@ const Game = sequelize.define('game', {
   },
   playerMinYr: {
     type: Sequelize.TINYINT,
-    allowNull: false,
     validate: { min: 0 }
   },
   playerMinQt: {

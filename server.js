@@ -43,8 +43,8 @@ app.get('/game/name/:name', (req,res) => {
   .catch ((error) => {
     res.send(error);
   })
-
-})//  get named game with edition
+})
+//  get named game with edition
 app.get('/game/name/:name/edition/:edition', (req,res) => {
   let editionStr = decodeURIComponent(req.params.edition);
   if (req.params.edition === '') {
@@ -66,6 +66,14 @@ app.get('/game/name/:name/edition/:edition', (req,res) => {
 
 // Add a new game
 app.post ('/addgame', (req,res) => {
+  let addShrinkIn = 0;
+  if (req.body.shrinkIn) {
+    addShrinkIn = 1;
+  }
+  let addRulesIn = 0;
+  if (req.body.rulesIn) {
+    addRulesIn = 1;
+  }
   Game.create({
     nameTx : req.body.nameTx,
     editionTx : req.body.editionTx,
@@ -79,8 +87,8 @@ app.post ('/addgame', (req,res) => {
     playerBestQt : req.body.playerBestQt,
     timeMinQt : req.body.timeMinQt,
     timeMaxQt : req.body.timeMaxQt,
-    shrinkIn : req.body.shrinkIn,
-    rulesIn : req.body.rulesIn,
+    shrinkIn : addShrinkIn,
+    rulesIn : addRulesIn,
     liquidateCd : req.body.liquidateCd,
     keywordsTx : req.body.keywordsTx
   })
@@ -146,6 +154,19 @@ app.get('/plays', (req,res) => {
   })
   .then (plays => {
     res.send(plays);
+  })
+  .catch ((error) => {
+    res.send(error);
+  })
+})
+
+//  get named game's plays ignoring edition
+app.get('/play/name/:name', (req,res) => {
+  Play.findAll({
+    where : { nameTx: { [Op.like]: '%' + decodeURIComponent(req.params.name) + '%' }}
+  })
+  .then (play => {
+    res.send(play);
   })
   .catch ((error) => {
     res.send(error);
