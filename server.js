@@ -163,7 +163,7 @@ app.get('/plays', (req,res) => {
 //  get named game's plays ignoring edition
 app.get('/play/name/:name', (req,res) => {
   Play.findAll({
-    where : { nameTx: { [Op.like]: '%' + decodeURIComponent(req.params.name) + '%' }}
+    where : { nameTx: { [Op.like]: decodeURIComponent(req.params.name) + '%' }}
   })
   .then (play => {
     res.send(play);
