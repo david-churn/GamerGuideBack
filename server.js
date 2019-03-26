@@ -31,6 +31,18 @@ app.get('/games', (req,res) => {
     res.send(error);
   })
 })
+// get the latest game
+app.get('/latestgame', (req,res) => {
+  Game.findOne ({
+      order: [['gameID','DESC']]
+  })
+  .then (games => {
+    res.send(games);
+  })
+  .catch ((error) => {
+    res.send(error);
+  })
+})
 
 //  get named game ignoring edition
 app.get('/game/name/:name', (req,res) => {
@@ -55,6 +67,49 @@ app.get('/game/name/:name/edition/:edition', (req,res) => {
       nameTx : decodeURIComponent(req.params.name),
       editionTx: editionStr
       }
+  })
+  .then (game => {
+    res.send(game);
+  })
+  .catch ((error) => {
+    res.send(error);
+  })
+})
+
+//  post to allow a search query for the result
+app.post('/searchgames', (req,res) => {
+  let whereObj = {};
+  if (req.body.nameTx) {
+    whereObj.nameTx = {[Op.like]: req.body.nameTx + '%'};
+  }
+  if (req.body.editionTx) {
+    whereObj.editionTx = {[Op.like]: req.body.editionTx + '%'};
+  }
+// s/b > pass ratingQt
+  if (req.body.ratingQt) {
+    whereObj.ratingQt = {[Op.gte]: req.body.ratingQt};
+  }
+// s/b <= maxAgeYr
+  if (req.body.ageMinYr) {
+    whereObj.playerMinYr = {[Op.lte]: req.body.ageMinYr} ;
+  }
+// s/b min <= passed <= max
+  if (req.body.playerQt) {
+    whereObj.playerMinQt = {[Op.lte]: req.body.playerQt} ;
+    whereObj.playerMaxQt = {[Op.gte]: req.body.playerQt};
+  }
+// s/b min <= passed <= max
+  if (req.body.timeQt) {
+    whereObj.timeMinQt = {[Op.lte]: req.body.timeQt};
+    whereObj.timeMaxQt = {[Op.gte]: req.body.timeQt};
+  }
+  if (req.body.keywordTx) {
+    whereObj.keywordsTx = {[Op.like]: '%' + req.body.keywordTx + '%'};
+  }
+  // whereObj.order = ['rating','DESC','name','edition']
+  Game.findAll({
+    where : whereObj,
+    order: [['ratingQt','DESC'],'nameTx','editionTx']
   })
   .then (game => {
     res.send(game);
@@ -100,8 +155,51 @@ app.post ('/addgame', (req,res) => {
   })
 })
 
+// Update the shrink wrap code
+app.patch ('/gameshrink/:id', (req,res) => {
+  let updShrinkIn = 0;
+  if (req.body.shrinkIn) {
+    updShrinkIn = 1;
+  }
+  Game.update({
+    shrinkIn : updShrinkIn
+  },{
+    where: {
+      gameID : req.params.id
+    }
+  })
+})
+
+// Update the rules code
+app.patch ('/gamerule/:id', (req,res) => {
+  let updRulesIn = 0;
+  if (req.body.rulesIn) {
+    updRulesIn = 1;
+  }
+  Game.update({
+    rulesIn : updRulesIn
+  },{
+    where: {
+      gameID : req.params.id
+    }
+  })
+  .then (game => {
+    res.send(game);
+  })
+  .catch ((error) => {
+    res.send(error);
+  })
+})
 // Update all the columns for one game
 app.put ('/chggame/:id', (req,res) => {
+  let updShrinkIn = 0;
+  if (req.body.shrinkIn) {
+    updShrinkIn = 1;
+  }
+  let updRulesIn = 0;
+  if (req.body.rulesIn) {
+    updRulesIn = 1;
+  }
   Game.update({
     nameTx : req.body.nameTx,
     editionTx : req.body.editionTx,
@@ -115,8 +213,8 @@ app.put ('/chggame/:id', (req,res) => {
     playerBestQt : req.body.playerBestQt,
     timeMinQt : req.body.timeMinQt,
     timeMaxQt : req.body.timeMaxQt,
-    shrinkIn : req.body.shrinkIn,
-    rulesIn : req.body.rulesIn,
+    shrinkIn : updShrinkIn,
+    rulesIn : updRulesIn,
     liquidateCd : req.body.liquidateCd,
     keywordsTx : req.body.keywordsTx
   },{
@@ -142,13 +240,38 @@ app.delete ('/delgame/:id', (req,res) => {
   .then (game => {
     res.send(String(game));
   })
-  .catch ((error) => {
+  .catch (error => {
     res.send(error);
   })
 })
 
 //===>  plays Code
-// get a list of the play lines.
+
+// get the play statistics for a game.
+app.get('/playstats/:name', (req,res) => {
+  let responseObj = {};
+  sequelize.query("select max(startDtTm) as lastPlayDtTm, count(*) as playQt, avg(ratingQt) as averageRatingQt from gamer.plays where nameTx = ? group by nameTx",
+    { replacements: [ decodeURIComponent(req.params.name) ],
+        type: sequelize.QueryTypes.SELECT })
+  .then (plays => {
+    responseObj = plays[0];
+    return Play.count({
+      where : {
+        nameTx: decodeURIComponent(req.params.name),
+        winCd: { [Op.like]: '%win%' }
+      }
+    })
+  })
+  .then (winQt => {
+    responseObj.winQt = winQt;
+    res.send(responseObj);
+  })
+  .catch ((error) => {
+    res.send(error);
+  })
+})
+
+// get a list of all the plays.
 app.get('/plays', (req,res) => {
   Play.findAll({
   })
@@ -215,7 +338,6 @@ app.put ('/chgplay/:id', (req,res) => {
 
 //  Delete one play
 app.delete ('/delplay/:id', (req,res) => {
-  console.log(req.params);
   Play.destroy({
     where: {
       playID : req.params.id
