@@ -120,7 +120,7 @@ app.post('/searchgames', (req,res) => {
 })
 
 // Add a new game
-app.post ('/addgame', (req,res) => {
+app.post('/addgame', (req,res) => {
   let addShrinkIn = 0;
   if (req.body.shrinkIn) {
     addShrinkIn = 1;
@@ -156,7 +156,7 @@ app.post ('/addgame', (req,res) => {
 })
 
 // Update the shrink wrap code
-app.patch ('/gameshrink/:id', (req,res) => {
+app.patch('/gameshrink/:id', (req,res) => {
   let updShrinkIn = 0;
   if (req.body.shrinkIn) {
     updShrinkIn = 1;
@@ -171,7 +171,7 @@ app.patch ('/gameshrink/:id', (req,res) => {
 })
 
 // Update the rules code
-app.patch ('/gamerule/:id', (req,res) => {
+app.patch('/gamerule/:id', (req,res) => {
   let updRulesIn = 0;
   if (req.body.rulesIn) {
     updRulesIn = 1;
@@ -191,7 +191,7 @@ app.patch ('/gamerule/:id', (req,res) => {
   })
 })
 // Update all the columns for one game
-app.put ('/chggame/:id', (req,res) => {
+app.put('/chggame/:id', (req,res) => {
   let updShrinkIn = 0;
   if (req.body.shrinkIn) {
     updShrinkIn = 1;
@@ -231,7 +231,7 @@ app.put ('/chggame/:id', (req,res) => {
 })
 
 //  Delete one game
-app.delete ('/delgame/:id', (req,res) => {
+app.delete('/delgame/:id', (req,res) => {
   Game.destroy({
     where: {
       gameID : req.params.id
@@ -296,7 +296,8 @@ app.get('/play/name/:name', (req,res) => {
   })
 })
 
-app.post ('/addplay', (req,res) => {
+app.post('/addplay', (req,res) => {
+  console.log(req.body);
   Play.create({
     nameTx : req.body.nameTx,
     editionTx : req.body.editionTx,
@@ -314,7 +315,7 @@ app.post ('/addplay', (req,res) => {
   })
 })
 // Update all the columns for one play
-app.put ('/chgplay/:id', (req,res) => {
+app.put('/chgplay/:id', (req,res) => {
   Play.update({
     nameTx : req.body.nameTx,
     editionTx : req.body.editionTx,
