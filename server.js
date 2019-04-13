@@ -21,16 +21,16 @@ app.use(bodyParser.json());
 
 //===>  Games Code
 // get the Game information
-app.get('/games', (req,res) => {
-  Game.findAll ({
-  })
-  .then (games => {
-    res.send(games);
-  })
-  .catch ((error) => {
-    res.send(error);
-  })
-})
+// app.get('/games', (req,res) => {
+//   Game.findAll ({
+//   })
+//   .then (games => {
+//     res.send(games);
+//   })
+//   .catch ((error) => {
+//     res.send(error);
+//   })
+// })
 // get the latest game
 app.get('/latestgame', (req,res) => {
   Game.findOne ({
@@ -272,16 +272,16 @@ app.get('/playstats/:name', (req,res) => {
 })
 
 // get a list of all the plays.
-app.get('/plays', (req,res) => {
-  Play.findAll({
-  })
-  .then (plays => {
-    res.send(plays);
-  })
-  .catch ((error) => {
-    res.send(error);
-  })
-})
+// app.get('/plays', (req,res) => {
+//   Play.findAll({
+//   })
+//   .then (plays => {
+//     res.send(plays);
+//   })
+//   .catch ((error) => {
+//     res.send(error);
+//   })
+// })
 
 //  get named game's plays ignoring edition
 app.get('/play/name/:name', (req,res) => {
